@@ -1,0 +1,64 @@
+{
+    "name": "cbaur/cmp-mediarenderer",
+    "type": "typo3-cms-extension",
+    "description": "TYPO3 extension overriding the default YouTube & Vimeo output with markup supporting Cookiebot CMP",
+    "license": "GPL-2.0-or-later",
+    "require": {
+        "php": "^8.1",
+        "typo3/cms-core": "^10.4 || ^11.5 || ^12.4 || ^13.0"
+    },
+    "require-dev": {
+        "typo3/coding-standards": "^0.7.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Cbaur\\CmpMediarenderer\\": "Classes/"
+        }
+    },
+    "extra": {
+        "typo3/cms": {
+            "extension-key": "cmp_mediarenderer"
+        }
+    },
+    "authors": [
+        {
+            "name": "Christian Baur",
+            "role": "Developer",
+            "email": "c.baur@i-san.de",
+            "homepage": "https://christianbaur.de/"
+        }
+    ],
+    "keywords": [
+        "typo3",
+        "cmp",
+        "youtube",
+        "vimeo",
+        "video",
+        "media",
+        "gdpr",
+        "blocker",
+        "cookiebot"
+    ],
+    "support": {
+        "issues": "https://github.com/cbaur/cmp-mediarenderer/issues"
+    },
+    "funding": [
+        {
+            "type": "other",
+            "url:": "https://github.com/cbaur/cmp-mediarenderer/pulls"
+        }
+    ],
+    "scripts": {
+        "prepare-release": [
+            "rm .gitignore",
+            "rm -rf .devbox",
+            "rm -rf .gitignore"
+        ],
+        "local-release": [
+            "rsync -uav -R --exclude='.devbox/' --exclude='.git/' ./ ./.devbox/t3-13/packages/cmp-mediarenderer/",
+            "rsync -uav -R --exclude='.devbox/' --exclude='.git/' ./ ./.devbox/t3-12/packages/cmp-mediarenderer/",
+            "rsync -uav -R --exclude='.devbox/' --exclude='.git/' ./ ./.devbox/t3-11/packages/cmp-mediarenderer/",
+            "rsync -uav -R --exclude='.devbox/' --exclude='.git/' ./ ./.devbox/t3-10/packages/cmp-mediarenderer/"
+        ]
+    }
+}

@@ -1,0 +1,18 @@
+plugin.tx_cmpmediarenderer {
+    settings {
+        services {
+            Google Maps {
+                regex = /google\.com\/maps\/embed/
+                category = Marketing
+            }
+            YouTube {
+                regex = /youtube(-nocookie)?\.com\/embed\//
+                category = Marketing
+            }
+            Vimeo {
+                regex = /player\.vimeo\.com\/video\//
+                category = Marketing
+            }
+        }
+    }
+}
