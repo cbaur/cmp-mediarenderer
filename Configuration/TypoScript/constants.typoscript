@@ -1,0 +1,6 @@
+plugin.tx_cmpmediarenderer {
+    settings {
+        loadDefaultStyles = 1
+        loadJsGlobally = 1
+    }
+}

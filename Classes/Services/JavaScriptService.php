@@ -11,34 +11,26 @@ namespace Cbaur\CmpMediarenderer\Services;
  *
  ***/
 
- use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
+use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
  use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Page\AssetCollector;
 
 class JavaScriptService
 {
+    protected array $settings;
 
-    protected $settings = [];
+    public function injectSettings(array $settings)
+    {
+        $this->settings = $settings;
+    }
 
 
-
-    public static function injectJs()
+    public function injectJs()
     {
 
-        $services = self::$settings['services'] ?? [];
-        /*
-        [
-            'Google Maps' => [
-                'regex' => '/google\.com\/maps\/embed/',
-                'category' => 'Marketing'
-            ],
-            'Vimeo' => '/player\.vimeo\.com\/video\//',
-            'YouTube' => '/youtube(-nocookie)?\.com\/embed\//',
-        ];
-        */
+        $services = $this->settings['services'] ?? [];
 
         $textMessages = [];
-
         foreach(array_keys($services) as $service) {
             $l10nParams = [
                 $services[$service]['category'] ?? 'Marketing',
@@ -66,7 +58,8 @@ class JavaScriptService
                 let m='',
                     cat='marketing', sp=undefined;
                 for(const se in c){
-                    if(c[se]['regex'].test(s)){
+                    const regex = new RegExp(c[se]['regex']);
+                    if(regex.test(s)){
                         sp=c[se]['lcc'];
                         m=c[se]['message'];
                         cat=c[se]['category'].toLowerCase();
@@ -74,9 +67,13 @@ class JavaScriptService
                     }
                 }    
                 if(!sp)return;
-                div.innerHTML=`<div class=\"cookiebot-placeholder cookiebot-placeholder--\${sp}\" style=\"--cookiebot-placeholder-preview: url(\${e.dataset.previewImage})\">`
-                 +`<a href=\"javascript:Cookiebot.renew()\" class=\"cookiebot-placeholder--inner\">\${m}`
+                div.innerHTML=`<div class=\"cookiebot-placeholder--inner cookiebot-placeholder--\${sp}\">`
+                 +`<a href=\"javascript:Cookiebot.renew()\" class=\"cookiebot-placeholder--link\">\${m}`
                  +'</div>';
+                 div.style = e.dataset.previewImage ? `--cookiebot-placeholder-preview: url(\${e.dataset.previewImage})` : '';
+                 if(e.width) div.style.setProperty('--cookiebot-placeholder-width', e.width + 'px');
+                 if(e.height) div.style.setProperty('--cookiebot-placeholder-height', e.height + 'px');
+                 div.classList.add('cookiebot-placeholder');
                  div.classList.add(`cookieconsent-optout-\${cat}`);
                  e.parentNode.insertBefore(div, e);
             });

@@ -10,6 +10,7 @@ namespace Cbaur\CmpMediarenderer\Resource\Rendering;
  *
  ***/
 
+use Cbaur\CmpMediarenderer\Services\JavaScriptService;
 use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\Resource\FileReference;
@@ -38,6 +39,8 @@ trait CookiebotAwareVideoRenderer
      */
     public function render(FileInterface $file, $width, $height, array $options = [], $usedPathsRelativeToCurrentScript = false)
     {
+        GeneralUtility::makeInstance(JavaScriptService::class)->injectJs();
+     
         $options = $this->collectOptions($options, $file);
 
         $previewImage = $this->getPreviewImage($file, $width, $height) ?? null;
@@ -64,11 +67,7 @@ trait CookiebotAwareVideoRenderer
     protected function getPreviewImage($file, $width = 0, $height = 0)
     {
         $previewImageWebPath = null;
-        if ($file instanceof FileReference) {
-            $orgFile = $file->getOriginalFile();
-        } else {
-            $orgFile = $file;
-        }
+        $orgFile = $file instanceof FileReference ? $file->getOriginalFile() : $file;
 
         $previewImage = $this->onlineMediaHelper->getPreviewImage($orgFile);
 

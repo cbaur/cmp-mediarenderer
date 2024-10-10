@@ -1,18 +1,28 @@
 plugin.tx_cmpmediarenderer {
     settings {
         services {
-            Google Maps {
-                regex = /google\.com\/maps\/embed/
+            GoogleMaps {
+                regex = google.com/maps/embed
                 category = Marketing
             }
             YouTube {
-                regex = /youtube(-nocookie)?\.com\/embed\//
+                regex = youtube(-nocookie)?.com/embed/
                 category = Marketing
             }
             Vimeo {
-                regex = /player\.vimeo\.com\/video\//
+                regex = player.vimeo.com/video/
                 category = Marketing
             }
         }
     }
 }
+
+page.includeCSSLibs.1728148429 = EXT:cmp_mediarenderer/Resources/Public/Css/mediarenderer.css
+page.includeCSSLibs.1728148429.if.directReturn = {$plugin.tx_cmpmediarenderer.settings.loadDefaultStyles}
+
+[{$plugin.tx_cmpmediarenderer.settings.loadJsGlobally} === 1]
+page.1728148429 = USER
+page.1728148429 {
+   userFunc = Cbaur\CmpMediarenderer\Services\JavaScriptService->injectJs
+}
+[END]

@@ -7,16 +7,17 @@ services:
   Cbaur\CmpMediarenderer\:
     resource: '../Classes/*'
 
-  extbaseSettings.CmpMediaRenderer:
+  extbaseSettings.CmpMediarenderer:
     class: 'array'
     factory:
       - '@TYPO3\CMS\Extbase\Configuration\ConfigurationManager'
       - 'getConfiguration'
     arguments:
       $configurationType: 'Settings'
-      $extensionName: 'CmpMediaRenderer'
-      $pluginName: ''
-
+      $extensionName: 'CmpMediarenderer'
   Cbaur\CmpMediarenderer\Services\JavaScriptService:
-    arguments:
-      $settings: '@extbaseSettings.CmpMediaRenderer'
+    public: true
+    calls:
+      - method: 'injectSettings'
+        arguments:
+          $settings: '@extbaseSettings.CmpMediarenderer'
