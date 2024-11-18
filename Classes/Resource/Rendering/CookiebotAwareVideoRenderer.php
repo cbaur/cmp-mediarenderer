@@ -50,7 +50,7 @@ trait CookiebotAwareVideoRenderer
                 '| src="|',
             ],
             [
-                ' data-cookieconsent="marketing" data-cookieblock-text="'. LocalizationUtility::translate($this->getCookieblockTextTranslationKey(), 'CreaThemeBs4Child', $this->getCookieblockTextArguments()) .'" data-preview-image="' . $previewImage . '" data-cookieblock-src="',
+                ' data-cookieconsent="marketing" data-cookieblock-text="'. LocalizationUtility::translate($this->getCookieblockTextTranslationKey(), 'CmpMediarenderer', $this->getCookieblockTextArguments()) .'" data-preview-image="' . $previewImage . '" data-cookieblock-src="',
             ],
             parent::render($file, $width, $height, $options, $usedPathsRelativeToCurrentScript)
         );
