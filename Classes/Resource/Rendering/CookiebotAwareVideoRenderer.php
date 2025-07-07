@@ -100,11 +100,7 @@ trait CookiebotAwareVideoRenderer
             }
 
              /** @var ContentObjectRenderer $contentObjectRenderer */
-            if (isset($GLOBALS['TSFE'])) {
-                $contentObjectRenderer = GeneralUtility::makeInstance(ContentObjectRenderer::class, $GLOBALS['TSFE']);
-            } else {
-                $contentObjectRenderer = GeneralUtility::makeInstance(ContentObjectRenderer::class);
-            }
+            $contentObjectRenderer = GeneralUtility::makeInstance(ContentObjectRenderer::class, $GLOBALS['TSFE']);
             $previewImageWebPath = '/' . ltrim($contentObjectRenderer->cObjGetSingle('IMG_RESOURCE', $conf), '/');
 
             
