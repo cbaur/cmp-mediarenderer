@@ -48,6 +48,50 @@ At the moment, it is not possible to change the content blocker poster's HTML by
 - you can extend the classes being set on the elements with Tailwind or other framework classes
 - many style properties of the default stylesheet can be overridden by resetting CSS variables
 
+## Additional Services & custom iframes
+
+You can use this extension to block any iframe until a specific consent category is accepted. To do so, insert the iframe into your website, e.g. using an HTML content element in the TYPO3 backend:
+
+```html
+<iframe
+  src="https://..."
+  ...
+></iframe>
+```
+
+Afterwards, rename the `src` attribute of the iframe to `data-cookieblock-src`:
+
+```html
+<iframe
+  data-cookieblock-src="https://..."
+  ...
+></iframe>
+```
+
+We refer to the iframe src as a "Service" that should be loaded. Each of these services has to be registered in the extension's TypoScript config:
+
+```
+plugin.tx_cmpmediarenderer {
+    settings {
+        services {
+            GoogleMaps {
+                regex = google.com/maps/embed
+                category = Marketing
+            }
+            YouTube {
+                regex = youtube(-nocookie)?.com/embed/
+                category = Marketing
+            }
+            Vimeo {
+                regex = player.vimeo.com/video/
+                category = Marketing
+            }
+            # add any other service here
+        }
+    }
+}
+```
+
 
 ## Developers corner
 
