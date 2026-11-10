@@ -4,8 +4,10 @@
     "description": "TYPO3 extension overriding the default YouTube & Vimeo output with markup supporting Cookiebot CMP",
     "license": "GPL-2.0-or-later",
     "require": {
-        "php": "^8.1",
-        "typo3/cms-core": "^10.4 || ^11.5 || ^12.4 || ^13.0"
+        "php": "^8.2",
+        "typo3/cms-core": "^13.4 || ^14.3",
+        "typo3/cms-extbase": "^13.4 || ^14.3",
+        "typo3/cms-frontend": "^13.4 || ^14.3"
     },
     "require-dev": {
         "typo3/coding-standards": "^0.7.1"
