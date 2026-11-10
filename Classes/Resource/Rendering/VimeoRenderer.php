@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Cbaur\CmpMediarenderer\Resource\Rendering;
 
 /***
@@ -9,13 +12,6 @@ namespace Cbaur\CmpMediarenderer\Resource\Rendering;
  * LICENSE file that was distributed with this source code.
  *
  ***/
-
-use TYPO3\CMS\Core\Core\Environment;
-use TYPO3\CMS\Core\Resource\FileInterface;
-use TYPO3\CMS\Core\Resource\FileReference;
-use TYPO3\CMS\Core\TypoScript\TypoScriptService;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 
 class VimeoRenderer extends \TYPO3\CMS\Core\Resource\Rendering\VimeoRenderer
 {

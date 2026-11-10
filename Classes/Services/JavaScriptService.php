@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Cbaur\CmpMediarenderer\Services;
 
 /***
@@ -11,49 +14,64 @@ namespace Cbaur\CmpMediarenderer\Services;
  *
  ***/
 
-use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
- use TYPO3\CMS\Core\Utility\GeneralUtility;
+use Psr\Http\Message\ServerRequestInterface;
+use TYPO3\CMS\Core\Attribute\AsAllowedCallable;
 use TYPO3\CMS\Core\Page\AssetCollector;
+use TYPO3\CMS\Core\TypoScript\FrontendTypoScript;
+use TYPO3\CMS\Core\TypoScript\TypoScriptService;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
 class JavaScriptService
 {
-    protected array $settings;
+    public function __construct(
+        private readonly AssetCollector $assetCollector,
+        private readonly TypoScriptService $typoScriptService,
+    ) {}
 
-    public function injectSettings(array $settings)
+    /**
+     * Also used as TypoScript USER userFunc, hence the ($content, $conf, $request) signature.
+     */
+    #[AsAllowedCallable]
+    public function injectJs(string $content = '', array $conf = [], ?ServerRequestInterface $request = null): string
     {
-        $this->settings = $settings;
-    }
+        $request ??= $GLOBALS['TYPO3_REQUEST'] ?? null;
+        if (!$request instanceof ServerRequestInterface) {
+            return '';
+        }
 
+        $services = $this->getSettings($request)['services'] ?? [];
 
-    public function injectJs()
-    {
-
-        $services = $this->settings['services'] ?? [];
-
-        $textMessages = [];
-        foreach(array_keys($services) as $service) {
+        foreach (array_keys($services) as $service) {
             $l10nParams = [
                 $services[$service]['category'] ?? 'Marketing',
-                $service
+                $service,
             ];
             $serviceLcc = GeneralUtility::underscoredToLowerCamelCase(
-                preg_replace('/\s+/', '_', trim($service))
+                (string)preg_replace('/\s+/', '_', trim((string)$service))
             );
             $services[$service]['message'] = LocalizationUtility::translate(
-                'cookiebot.blockingMessage.'
-                 . $serviceLcc , 'CmpMediarenderer', $l10nParams)
-            ?? LocalizationUtility::translate('cookiebot.blockingMessage', 'CmpMediarenderer', $l10nParams);
+                'cookiebot.blockingMessage.' . $serviceLcc,
+                'CmpMediarenderer',
+                $l10nParams,
+                null,
+                $request
+            ) ?? LocalizationUtility::translate('cookiebot.blockingMessage', 'CmpMediarenderer', $l10nParams, null, $request);
+            $services[$service]['category'] ??= 'Marketing';
             $services[$service]['lcc'] = $serviceLcc;
         }
 
-        GeneralUtility::makeInstance(AssetCollector::class)->addInlineJavaScript('cookiebot-generate-placeholder', "
+        $servicesJson = json_encode(
+            $services,
+            JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR
+        );
+
+        $this->assetCollector->addInlineJavaScript('cookiebot-generate-placeholder', "
         ((d,i)=>{
-            c=JSON.parse('".json_encode($services)."');
-            ce=e=>d.createElement(e);
+            const c=" . $servicesJson . ";
+            const ce=e=>d.createElement(e);
             d.querySelectorAll(i).forEach(e=>{
-                const a=ce('a'),
-                    div=ce('div'),
-                    p=ce('p'),
+                const div=ce('div'),
                     s=e.dataset.cookieblockSrc;
                 let m='',
                     cat='marketing', sp=undefined;
@@ -65,10 +83,10 @@ class JavaScriptService
                         cat=c[se]['category'].toLowerCase();
                         break;
                     }
-                }    
+                }
                 if(!sp)return;
                 div.innerHTML=`<div class=\"cookiebot-placeholder--inner cookiebot-placeholder--\${sp}\">`
-                 +`<a href=\"javascript:Cookiebot.renew()\" class=\"cookiebot-placeholder--link\">\${m}`
+                 +`<a href=\"javascript:Cookiebot.renew()\" class=\"cookiebot-placeholder--link\">\${m}</a>`
                  +'</div>';
                  div.style = e.dataset.previewImage ? `--cookiebot-placeholder-preview: url(\${e.dataset.previewImage})` : '';
                  if(e.width) div.style.setProperty('--cookiebot-placeholder-width', e.width + 'px');
@@ -78,5 +96,24 @@ class JavaScriptService
                  e.parentNode.insertBefore(div, e);
             });
         })(document, 'iframe[data-cookieblock-src]')");
+
+        return '';
+    }
+
+    /**
+     * Reads plugin.tx_cmpmediarenderer.settings from the frontend TypoScript of the current request.
+     */
+    protected function getSettings(ServerRequestInterface $request): array
+    {
+        $typoScript = $request->getAttribute('frontend.typoscript');
+        if (!$typoScript instanceof FrontendTypoScript || !$typoScript->hasSetup()) {
+            return [];
+        }
+        try {
+            $settings = $typoScript->getSetupArray()['plugin.']['tx_cmpmediarenderer.']['settings.'] ?? [];
+        } catch (\RuntimeException) {
+            return [];
+        }
+        return is_array($settings) ? $this->typoScriptService->convertTypoScriptArrayToPlainArray($settings) : [];
     }
 }
